@@ -1,0 +1,91 @@
+.body{
+    margin: 0;
+    padding: 2rem;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #333;
+    background-color: white;
+}
+.header{
+    font-size: large;
+    background-color: #115cff;
+    color: white;
+    padding: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+.ids{
+    float: right;
+    margin: 1rem 0;
+}
+.account{
+    display: block;
+    margin: 4rem 0;
+    float: left;
+    width: 50%;
+    height: 30%;
+    text-align: left;
+}
+.account h2{
+    font-weight: bold;
+    margin: 0;
+    padding: 0;
+    font-size: medium;
+}
+.note{
+    padding-top: 30px;
+
+}
+.company{
+    float: right;
+    padding-top: 30px;
+}
+.company h3{
+    font-size: larger;
+    font-weight: bold;
+}
+.account th{
+    background-color: #115cff;
+    color: white;
+    border: 1px solid black;
+    text-align: center;
+}
+.account td{
+    font-size: larger;
+    border: 1px solid black;
+    text-align: right;
+    font-weight: bold;
+    padding: 5px;
+}
+.order{
+    float: none;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    padding: 1rem 0;
+}
+.order th{
+    background-color: #115cff;
+    color: white;
+    text-align: center;
+    border: 1px solid black;
+}
+.order td{
+    border: 1px solid black;
+}
+.bankInfo{
+    width: 50%;
+    height: 100%;
+    text-align: left;
+    padding: 1rem 0;
+}
+.bankInfo th, td{
+    border: 1px solid black;
+    padding: 5px;
+}
+.bankInfo th{
+    background-color: #115cff;
+    color: white;
+}
+
