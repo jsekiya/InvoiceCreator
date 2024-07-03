@@ -1,5 +1,9 @@
 import { LightningElement, api, wire } from 'lwc';
 import { getRecord } from 'lightning/uiRecordApi';
+
+import { loadScript } from 'lightning/platformResourceLoader';
+import JSPDF from '@salesforce/resourceUrl/jspdf';
+
 import ACCOUNT_NAME_FIELD from '@salesforce/schema/Opportunity.Account.Name';
 import AMOUNT_FIELD from '@salesforce/schema/Opportunity.Amount';
 import OPPORTUNITY_CLOSE_DATE from '@salesforce/schema/Opportunity.CloseDate';
@@ -43,6 +47,12 @@ const FIELDS = [
 ];
 
 export default class Invoice extends LightningElement {
+    opportunityDetails = [];
+    headers = this.createHeaders([
+        "Id",
+        "Product Name",
+        "Quantity"
+    ]);
     @api recordId;
     totalAmount;
     contactName;
@@ -66,6 +76,41 @@ export default class Invoice extends LightningElement {
     currentDate = new Date().toLocaleDateString();
     tenPercentAmount;
     beforeTax;
+
+    renderedCallback(){
+        Promise.all(values, [
+            loadScript(this, JSPDF)
+        ]);
+    }
+
+    generatePdf(){
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({
+            encryption: {
+                userPassword: "user",
+                ownerPassword: "owner",
+                userPermissions: ["print", "modify", "copy", "annot-forms"]
+            }
+        });
+        doc.text("test", 28, 28);
+        doc.table(30, 30, this.opportunityDetails, this.headers, { autosize:true });
+        doc.save("demo.pdf");
+    }
+
+    createHeaders(keys){
+        let result = [];
+        for (let i = 0; i<keys.length; i += 1){
+            result.push({
+                id: keys[i],
+                name: keys[i],
+                prompt : keys[i],
+                width: 65,
+                align: "center",
+                padding: 0
+            });
+        }
+        return result;
+    }
 
     @wire(getRecord, { recordId: '$recordId', fields: FIELDS })
     wiredOpportunity({ error, data }){
@@ -91,6 +136,9 @@ export default class Invoice extends LightningElement {
 
             this.tenPercentAmount = this.calculateTenPercent(this.totalAmount);
             this.beforeTax = this.totalAmount - this.tenPercentAmount;
+
+            this.generatePdf();
+            return data;
         }else if (error){
             this.error = error;
         }
