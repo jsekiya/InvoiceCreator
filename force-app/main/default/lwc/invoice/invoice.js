@@ -24,6 +24,7 @@ import BANK_DEPOSIT_TYPE_FIELD from '@salesforce/schema/Opportunity.BankAccount_
 import BANK_ACCOUNT_HOLDER_FIELD from '@salesforce/schema/Opportunity.BankAccount__r.BankAccountHolderName__c';
 
 import getOpportunityLineItems from '@salesforce/apex/OpportunityLineItemController.getOpportunityLineItems';
+import Quantity from '@salesforce/schema/Asset.Quantity';
 
 const FIELDS = [
     ACCOUNT_NAME_FIELD,
@@ -51,7 +52,9 @@ export default class Invoice extends LightningElement {
     headers = this.createHeaders([
         "ServiceDate",
         "Name",
-        "Quantity"
+        "Quantity",
+        "UnitPrice",
+        "TotalPrice"
     ]);
     @api recordId;
     totalAmount;
@@ -128,7 +131,30 @@ export default class Invoice extends LightningElement {
         doc.text('Account Holder: ' + this.accountHolderName, 14, 146);
         
         //opportunity line items
-        doc.table(14, 152, this.opportunityLineItems, this.headers, {autosize: true});
+        if(this.opportunityLineItems){
+            const tableColumn = ["ServiceDate", "Name", "Quantity", "UnitPrice", "TotalPrice"];
+            const tableRows = [];
+
+            this.opportunityLineItems.forEach(item => {
+                const itemData = [
+                    item.ServiceDate,
+                    item.Name,
+                    item.Quantity,
+                    item.UnitPrice,
+                    item.TotalPrice
+                ];
+                tableRows.push(itemData);
+            });
+
+            doc.autoTable({
+                head: [tableColumn],
+                body: tableRows,
+                startY: 160,
+                theme: 'striped',
+                headStyles: { fillColor: [41, 128, 185] },
+                margin: { top: 160 }
+            });
+        }
 
         doc.save("demo.pdf");
     }
@@ -183,7 +209,13 @@ export default class Invoice extends LightningElement {
     @wire(getOpportunityLineItems, { recordId: '$recordId'})
     wiredOpportunityLineItems({ error, data }) {
         if (data) {
-            this.opportunityLineItems = data;
+            this.opportunityLineItems = data.map(item => ({
+                ServiceDate: item.ServiceDate,
+                Name: item.Name,
+                Quantity: item.Quantity,
+                UnitPrice: item.UnitPrice,
+                TotalPrice: item.TotalPrice
+            }));
         } else if (error) {
             this.error = error;
         }
