@@ -49,8 +49,8 @@ const FIELDS = [
 export default class Invoice extends LightningElement {
     opportunityDetails = [];
     headers = this.createHeaders([
-        "Id",
-        "Product Name",
+        "ServiceDate",
+        "Name",
         "Quantity"
     ]);
     @api recordId;
@@ -78,22 +78,58 @@ export default class Invoice extends LightningElement {
     beforeTax;
 
     renderedCallback(){
-        Promise.all(values, [
-            loadScript(this, JSPDF)
-        ]);
+        loadScript(this, JSPDF)
     }
 
     generatePdf(){
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({
-            encryption: {
+           /* encryption: {
                 userPassword: "user",
                 ownerPassword: "owner",
                 userPermissions: ["print", "modify", "copy", "annot-forms"]
-            }
+            }*/
         });
-        doc.text("test", 28, 28);
-        doc.table(30, 30, this.opportunityDetails, this.headers, { autosize:true });
+
+        //invoice header
+        doc.setFont('Helvetica', 'Bold');
+        doc.setFontSize(18);
+        doc.text('Invoice', 14, 20);
+
+        //Issue Date and Order Number
+        doc.setFontSize(12);
+        doc.text('Issue Date: ' + this.opportunityCloseDate, 14, 30);
+        doc.text('Invoice Number: ' + this.opportunityOrderNumber, 14, 36);
+
+        //Account Information
+        doc.setFontSize(14);
+        doc.text('To: ' + this.accountName, 14, 46);
+        doc.setFontSize(12);
+        doc.text('Billing Postal Code: ' + this.billingPostalCode, 14, 52);
+        doc.text('Address: ' + this.billingStreet + this.billingCity + this.billingStreet, 14, 58);
+        doc.text('Please find the details of the invoice below.', 14, 64);
+
+        //total amount
+        doc.setFontSize(14);
+        doc.text('Total Amount (incl. tax) JPN' + this.totalAmount, 14, 74);
+        
+        //company Information
+        doc.setFontSize(14);
+        doc.text(this.opportunityOwnerCompanyName, 14, 90);
+        doc.setFontSize(12);
+        doc.text('Postal Code: ' + this.opportunityOwnerPostalCode, 14, 96);
+        doc.text('Owner Address: ' + this.opportunityOwnerStreet, 14, 102);
+        doc.text('Owner Phone: ' + this.opportunityOwnerPhone, 14, 113);
+        doc.text('Owner Email: ' + this.opportunityOwnerEmail, 14, 119);
+        
+        //bank account information
+        doc.setFontSize(14);
+        doc.text('Bank Name: ' + this.bankName +' '+ this.branchName +' '+ this.bankAccountNumber, 14, 140);
+        doc.text('Account Holder: ' + this.accountHolderName, 14, 146);
+        
+        //opportunity line items
+        doc.table(14, 152, this.opportunityLineItems, this.headers, {autosize: true});
+
         doc.save("demo.pdf");
     }
 
