@@ -3,6 +3,7 @@ import { getRecord } from 'lightning/uiRecordApi';
 
 import { loadScript } from 'lightning/platformResourceLoader';
 import JSPDF from '@salesforce/resourceUrl/jspdf';
+import JSPDF_AUTOTABLE from '@salesforce/resourceUrl/jspdf_autotable';
 
 import ACCOUNT_NAME_FIELD from '@salesforce/schema/Opportunity.Account.Name';
 import AMOUNT_FIELD from '@salesforce/schema/Opportunity.Amount';
@@ -24,7 +25,7 @@ import BANK_DEPOSIT_TYPE_FIELD from '@salesforce/schema/Opportunity.BankAccount_
 import BANK_ACCOUNT_HOLDER_FIELD from '@salesforce/schema/Opportunity.BankAccount__r.BankAccountHolderName__c';
 
 import getOpportunityLineItems from '@salesforce/apex/OpportunityLineItemController.getOpportunityLineItems';
-import Quantity from '@salesforce/schema/Asset.Quantity';
+
 
 const FIELDS = [
     ACCOUNT_NAME_FIELD,
@@ -49,13 +50,6 @@ const FIELDS = [
 
 export default class Invoice extends LightningElement {
     opportunityDetails = [];
-    headers = this.createHeaders([
-        "ServiceDate",
-        "Name",
-        "Quantity",
-        "UnitPrice",
-        "TotalPrice"
-    ]);
     @api recordId;
     totalAmount;
     contactName;
@@ -81,18 +75,14 @@ export default class Invoice extends LightningElement {
     beforeTax;
 
     renderedCallback(){
-        loadScript(this, JSPDF)
+        loadScript(this, JSPDF),
+        loadScript(this, JSPDF_AUTOTABLE)
     }
 
     generatePdf(){
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({
-           /* encryption: {
-                userPassword: "user",
-                ownerPassword: "owner",
-                userPermissions: ["print", "modify", "copy", "annot-forms"]
-            }*/
-        });
+        const { jsPDFAutoTable } = window.jspdfAutoTable;
+        const doc = new jsPDF();
 
         //invoice header
         doc.setFont('Helvetica', 'Bold');
@@ -131,48 +121,29 @@ export default class Invoice extends LightningElement {
         doc.text('Account Holder: ' + this.accountHolderName, 14, 146);
         
         //opportunity line items
-        if(this.opportunityLineItems){
-            const tableColumn = ["ServiceDate", "Name", "Quantity", "UnitPrice", "TotalPrice"];
-            const tableRows = [];
+        const headers = ["ServiceDate", "Name", "Quantity", "UnitPrice", "TotalPrice"];
+        const tableData = this.opportunityLineItems.map(item => [
+            item.ServiceDate || '',
+            item.Name || '',
+            item.Quantity || 0,
+            item.UnitPrice || 0,
+            item.TotalPrice || 0
+        ]);
+        doc.autoTable({
+            head: [headers],
+            body: tableData,
+            startY: 160,
+        });
 
-            this.opportunityLineItems.forEach(item => {
-                const itemData = [
-                    item.ServiceDate,
-                    item.Name,
-                    item.Quantity,
-                    item.UnitPrice,
-                    item.TotalPrice
-                ];
-                tableRows.push(itemData);
-            });
-
-            doc.autoTable({
-                head: [tableColumn],
-                body: tableRows,
-                startY: 160,
-                theme: 'striped',
-                headStyles: { fillColor: [41, 128, 185] },
-                margin: { top: 160 }
-            });
-        }
-
-        doc.save("demo.pdf");
+        //total amount information
+        doc.setFontSize(10);
+        doc.text('Subtotal Before Tax: ' + this.beforeTax, 14, 210);
+        doc.text('Tax Amount: ' + this.tenPercentAmount, 14, 214);
+        doc.text('Total Amount: ' + this.totalAmount, 14, 218);
+        
+        doc.save(this.accountName+".pdf");
     }
 
-    createHeaders(keys){
-        let result = [];
-        for (let i = 0; i<keys.length; i += 1){
-            result.push({
-                id: keys[i],
-                name: keys[i],
-                prompt : keys[i],
-                width: 65,
-                align: "center",
-                padding: 0
-            });
-        }
-        return result;
-    }
 
     @wire(getRecord, { recordId: '$recordId', fields: FIELDS })
     wiredOpportunity({ error, data }){
