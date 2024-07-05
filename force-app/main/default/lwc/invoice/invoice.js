@@ -150,20 +150,25 @@ export default class Invoice extends LightningElement {
 
     sendEmail(){
         const pdfBlob = this.generatePdf();
+        const reader = new FileReader();
 
-        sendInvoiceEmail({
-            recipientEmail: this.opportunityOwnerEmail,
-            subject: 'Your invoice',
-            body: 'Your invoice is attached.',
-            attachment: pdfBlob,
-            fileName: this.accountName + '.pdf'
-        })
-        .then(result => {
-            console.log(result);
-        })
-        .catch(error => {
-            console.log(error);
-        });
+        reader.onloadend = () => {
+            const base64data = reader.result.split(',')[1];
+            sendInvoiceEmail({
+                recipientEmail: this.opportunityOwnerEmail,
+                subject: 'Your invoice',
+                body: 'Your invoice is attached.',
+                attachment: base64data,
+                fileName: this.accountName + '.pdf'
+            })
+            .then(result => {
+                console.log(result);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+        };
+        reader.readAsDataURL(pdfBlob);
     }
 
 
