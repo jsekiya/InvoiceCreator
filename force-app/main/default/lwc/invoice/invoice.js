@@ -25,6 +25,7 @@ import BANK_DEPOSIT_TYPE_FIELD from '@salesforce/schema/Opportunity.BankAccount_
 import BANK_ACCOUNT_HOLDER_FIELD from '@salesforce/schema/Opportunity.BankAccount__r.BankAccountHolderName__c';
 
 import getOpportunityLineItems from '@salesforce/apex/OpportunityLineItemController.getOpportunityLineItems';
+import sendInvoiceEmail from '@salesforce/apex/EmailService.sendInvoiceEmail';
 
 const FIELDS = [
     ACCOUNT_NAME_FIELD,
@@ -142,7 +143,27 @@ export default class Invoice extends LightningElement {
         doc.text('Tax Amount: ' + this.tenPercentAmount, 14, 214);
         doc.text('Total Amount: ' + this.totalAmount, 14, 218);
         
-        doc.save(this.accountName+".pdf");
+        //doc.save(this.accountName+".pdf");
+        const pdfOutput = doc.output('blob');
+        return pdfOutput;
+    }
+
+    sendEmail(){
+        const pdfBlob = this.generatePdf();
+
+        sendInvoiceEmail({
+            recipientEmail: this.opportunityOwnerEmail,
+            subject: 'Your invoice',
+            body: 'Your invoice is attached.',
+            attachment: pdfBlob,
+            fileName: this.accountName + '.pdf'
+        })
+        .then(result => {
+            console.log(result);
+        })
+        .catch(error => {
+            console.log(error);
+        });
     }
 
 
@@ -170,9 +191,7 @@ export default class Invoice extends LightningElement {
 
             this.tenPercentAmount = this.calculateTenPercent(this.totalAmount);
             this.beforeTax = this.totalAmount - this.tenPercentAmount;
-
-            this.generatePdf();
-            return data;
+         
         }else if (error){
             this.error = error;
         }
