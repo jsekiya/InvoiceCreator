@@ -1,7 +1,7 @@
 public with sharing class InvoiceHelper {
     @future(callout = true)
     public static void generateAndSendInvoice(Id oppId) {
-        Opportunity opp = [SELECT Id, Name, Amount, Account.Email__c FROM Opportunity WHERE Id = :oppId LIMIT 1];
+        /*Opportunity opp = [SELECT Id, Name, Amount, Account.Email__c FROM Opportunity WHERE Id = :oppId LIMIT 1];
         //generowanie linku do faktury
         String baseUrl = URL.getSalesforceBaseUrl().toExternalForm();
         String invoicePageUrl = baseUrl + '/lightning/cmp/c__invoice?recordId=' + opp.Id;
@@ -31,6 +31,6 @@ public with sharing class InvoiceHelper {
         });
         Messaging.sendEmail(new Messaging.SingleEmailMessage[]{
             mail
-        });
+        });*/
     }
 }

@@ -26,7 +26,6 @@ import BANK_ACCOUNT_HOLDER_FIELD from '@salesforce/schema/Opportunity.BankAccoun
 
 import getOpportunityLineItems from '@salesforce/apex/OpportunityLineItemController.getOpportunityLineItems';
 
-
 const FIELDS = [
     ACCOUNT_NAME_FIELD,
     AMOUNT_FIELD,
@@ -75,18 +74,20 @@ export default class Invoice extends LightningElement {
     beforeTax;
 
     renderedCallback(){
-        loadScript(this, JSPDF),
-        loadScript(this, JSPDF_AUTOTABLE)
+        loadScript(this, JSPDF)
+        .then(() => loadScript(this, JSPDF_AUTOTABLE))
+        .catch(error => {
+            console.log('error loading script', error);
+        });
     }
 
     generatePdf(){
         const { jsPDF } = window.jspdf;
-        const { jsPDFAutoTable } = window.jspdfAutoTable;
         const doc = new jsPDF();
 
         //invoice header
         doc.setFont('Helvetica', 'Bold');
-        doc.setFontSize(18);
+        doc.setFontSize(20);
         doc.text('Invoice', 14, 20);
 
         //Issue Date and Order Number
@@ -100,20 +101,20 @@ export default class Invoice extends LightningElement {
         doc.setFontSize(12);
         doc.text('Billing Postal Code: ' + this.billingPostalCode, 14, 52);
         doc.text('Address: ' + this.billingStreet + this.billingCity + this.billingStreet, 14, 58);
-        doc.text('Please find the details of the invoice below.', 14, 64);
+        doc.text('Please find the details of the invoice below.', 14, 85);
 
         //total amount
         doc.setFontSize(14);
-        doc.text('Total Amount (incl. tax) JPN' + this.totalAmount, 14, 74);
+        doc.text('Total Amount (incl. tax) JPN' + this.totalAmount, 14, 92);
         
         //company Information
-        doc.setFontSize(14);
-        doc.text(this.opportunityOwnerCompanyName, 14, 90);
-        doc.setFontSize(12);
-        doc.text('Postal Code: ' + this.opportunityOwnerPostalCode, 14, 96);
-        doc.text('Owner Address: ' + this.opportunityOwnerStreet, 14, 102);
-        doc.text('Owner Phone: ' + this.opportunityOwnerPhone, 14, 113);
-        doc.text('Owner Email: ' + this.opportunityOwnerEmail, 14, 119);
+        doc.setFontSize(13);
+        doc.text(this.opportunityOwnerCompanyName, 14, 105);
+        doc.setFontSize(11);
+        doc.text('Postal Code: ' + this.opportunityOwnerPostalCode, 14, 110);
+        doc.text('Owner Address: ' + this.opportunityOwnerStreet, 14, 115);
+        doc.text('Owner Phone: ' + this.opportunityOwnerPhone, 14, 125);
+        doc.text('Owner Email: ' + this.opportunityOwnerEmail, 14, 130);
         
         //bank account information
         doc.setFontSize(14);
