@@ -1,5 +1,7 @@
 import { LightningElement, api, wire } from 'lwc';
 import { getRecord } from 'lightning/uiRecordApi';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { CloseActionScreenEvent } from 'lightning/actions';
 
 import { loadScript } from 'lightning/platformResourceLoader';
 import JSPDF from '@salesforce/resourceUrl/jspdf';
@@ -73,6 +75,7 @@ export default class Invoice extends LightningElement {
     currentDate = new Date().toLocaleDateString();
     tenPercentAmount;
     beforeTax;
+    opportunityLineItemsFlag = false;
 
     renderedCallback(){
         loadScript(this, JSPDF)
@@ -123,25 +126,32 @@ export default class Invoice extends LightningElement {
         doc.text('Account Holder: ' + this.accountHolderName, 14, 146);
         
         //opportunity line items
-        const headers = ["ServiceDate", "Name", "Quantity", "UnitPrice", "TotalPrice"];
-        const tableData = this.opportunityLineItems.map(item => [
-            item.ServiceDate || '',
-            item.Name || '',
-            item.Quantity || 0,
-            item.UnitPrice || 0,
-            item.TotalPrice || 0
-        ]);
-        doc.autoTable({
-            head: [headers],
-            body: tableData,
-            startY: 160,
-        });
-
-        //total amount information
-        doc.setFontSize(10);
-        doc.text('Subtotal Before Tax: ' + this.beforeTax, 14, 210);
-        doc.text('Tax Amount: ' + this.tenPercentAmount, 14, 214);
-        doc.text('Total Amount: ' + this.totalAmount, 14, 218);
+        if(this.opportunityLineItems.length > 0){
+            const headers = ["ServiceDate", "Name", "Quantity", "UnitPrice", "TotalPrice"];
+            const tableData = this.opportunityLineItems.map(item => [
+                item.ServiceDate || '',
+                item.Name || '',
+                item.Quantity || 0,
+                item.UnitPrice || 0,
+                item.TotalPrice || 0
+            ]);
+            doc.autoTable({
+                head: [headers],
+                body: tableData,
+                startY: 160,
+            });
+            //total amount information
+            doc.setFontSize(10);
+            doc.text('Subtotal Before Tax: ' + this.beforeTax, 14, 210);
+            doc.text('Tax Amount: ' + this.tenPercentAmount, 14, 214);
+            doc.text('Total Amount: ' + this.totalAmount, 14, 218);
+        }else{
+            doc.setFontSize(13);
+            doc.text('Subtotal Before Tax: ' + this.beforeTax, 14, 160);
+            doc.text('Tax Amount: ' + this.tenPercentAmount, 14, 165);
+            doc.text('Total Amount: ' + this.totalAmount, 14, 169);
+        }
+        
         
         //doc.save(this.accountName+".pdf");
         const pdfOutput = doc.output('blob');
@@ -164,6 +174,12 @@ export default class Invoice extends LightningElement {
             })
             .then(result => {
                 console.log(result);
+                const event = new ShowToastEvent({
+                    title: 'Get Help',
+                    message:
+                        'Salesforce documentation is available in the app. Click ? in the upper-right corner.',
+                });
+                this.dispatchEvent(event);
             })
             .catch(error => {
                 console.log(error);
@@ -213,6 +229,7 @@ export default class Invoice extends LightningElement {
                 UnitPrice: item.UnitPrice,
                 TotalPrice: item.TotalPrice
             }));
+            this.opportunityLineItemsFlag = true;
         } else if (error) {
             this.error = error;
         }

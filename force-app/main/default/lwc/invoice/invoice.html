@@ -1,3 +1,134 @@
 <template>
-    <lightning-button onclick={sendEmail} label="Generate PDF"></lightning-button>
+    <div class="slds-p-around_medium">
+        <div class="slds-p-vertical_large slds-text-color_error slds-text-body_regular">この内容でよろしいですか？</div>
+        <div class="slds-align_absolute-center slds-text-heading_large slds-text-color_inverse" style="background:#16325c">請求書</div>
+
+        <div class="slds-clearfix">
+            <div class="slds-float_right slds-p-vertical_small">
+                <p>発行日: {opportunityCloseDate}</p>
+                <p>請求番号：{opportunityOrderNumber}</p>
+            </div>
+        </div>
+          
+        <div class="slds-p-vertical_xx-large sizing slds-grid slds-wrap">
+            <div class="slds-size_1-of-2">
+                <p class="slds-text-heading_medium">{accountName} 御中</p>
+                <p>〒{billingPostalCode}</p>
+                <p>{billingState},{billingCity},{billingStreet}</p>
+
+                <div class="slds-p-vertical_medium">
+                    <p>下記の通り、ご請求申し上げます。</p>
+                    <p class="slds-text-heading_small">ご請求金額（税込）</p>
+                    <lightning-formatted-number
+                        class="slds-text-heading_medium" 
+                        value={totalAmount} 
+                        format-style="currency" 
+                        currency-display-as= "symbol"
+                        maximum-fraction-digits="0"
+                    >
+                    </lightning-formatted-number>  
+                </div>           
+            </div>
+            <div class="slds-size_1-of-2">
+                <p class="slds-text-heading_medium">{opportunityOwnerCompanyName}</p>
+                <p>〒{opportunityOwnerPostalCode}</p>
+                <p>住所：{opportunityOwnerStreet}</p>
+                <p>電話：{opportunityOwnerPhone}</p>
+                <p>メール：{opportunityOwnerEmail}</p>
+            </div>
+        </div>
+        
+        <div class="slds-text-heading_small">振込先:</div>
+        <div class="slds-text-heading_medium">
+            <p>{bankName} {branchName} {depositType} {bankAccountNumber}</p> 
+            <p>{accountHolderName}（カ</p>
+        </div>
+
+        <div class="slds-p-vertical_xx-large">
+            <table>
+            <template lwc:if={opportunityLineItemsFlag}>
+                <tr class="slds-p-vertical_medium slds-text-color_inverse" style="background-color: #16325c;">
+                    <th>日付</th><th>内容</th><th>数量</th><th>単価</th><th>金額（税込み）</th>
+                </tr>
+                <template for:each={opportunityLineItems} for:item="lineItem">
+                    <tr key={lineItem.Id}>
+                        <td>{lineItem.ServiceDate}</td>
+                        <td>{lineItem.Name}</td>
+                        <td>{lineItem.Quantity}</td>
+                        <td>
+                        <lightning-formatted-number 
+                            value={lineItem.UnitPrice} 
+                            format-style="currency" 
+                            currency-display-as= "symbol"
+                            maximum-fraction-digits="0"
+                        >
+                        </lightning-formatted-number>
+                        </td>
+                        <td>
+                        <lightning-formatted-number 
+                            value={lineItem.TotalPrice} 
+                            format-style="currency" 
+                            currency-display-as= "symbol"
+                            maximum-fraction-digits="0"
+                        >
+                        </lightning-formatted-number>
+                        </td>
+                    </tr>
+                </template>
+                
+                <tr>
+                    <td style="border: none;"></td>
+                    <td style="border: none;"></td>
+                    <td style="border: none;"></td>
+                    <th>小計</th>
+                    <td style="font-weight: bold;">
+                        <lightning-formatted-number 
+                            value={beforeTax}
+                            format-style="currency" 
+                            currency-display-as= "symbol"
+                            maximum-fraction-digits="0"
+                        >
+                        </lightning-formatted-number>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="border: none;"></td>
+                    <td style="border: none;"></td>
+                    <td style="border: none;"></td>
+                    <th>消費税</th>
+                    <td style="font-weight: bold;">
+                        <lightning-formatted-number 
+                            value={tenPercentAmount}
+                            format-style="currency" 
+                            currency-display-as= "symbol"
+                            maximum-fraction-digits="0"
+                        >
+                        </lightning-formatted-number>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="border: none;"></td>
+                    <td style="border: none;"></td>
+                    <td style="border: none;"></td>
+                    <th>合計金額</th>
+                    <td style="font-weight: bold;">
+                        <lightning-formatted-number 
+                            value={totalAmount} 
+                            format-style="currency" 
+                            currency-display-as= "symbol"
+                            maximum-fraction-digits="0"
+                        >
+                        </lightning-formatted-number>
+                    </td>
+                </tr>
+            </template>
+            </table>
+        </div> 
+    
+    <div class="slds-p-bottom_large slds-p-horizontal_large">
+         <lightning-button class="slds-float_right" onclick={sendEmail} label="送信"></lightning-button>
+    </div>
+</div>
+   
+
 </template>
