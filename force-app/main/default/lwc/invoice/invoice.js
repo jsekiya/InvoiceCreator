@@ -154,6 +154,7 @@ export default class Invoice extends LightningElement {
 
         reader.onloadend = () => {
             const base64data = reader.result.split(',')[1];
+            
             sendInvoiceEmail({
                 recipientEmail: this.opportunityOwnerEmail,
                 subject: 'Your invoice',
