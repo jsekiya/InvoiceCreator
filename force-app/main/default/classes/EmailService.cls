@@ -5,13 +5,18 @@ public with sharing class EmailService {
                                                 FROM OpportunityLineItem WHERE OpportunityId = :opp.Id];
 
             //generate pdf blob
+            
             Blob pdfBlob = generatePdfBlob(opp, lineItems);
             //create email
             Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
             email.setToAddresses(new String[]{ opp.Owner.Email });
             email.setSubject('subject');
             email.setPlainTextBody('Your invoice is attached');
+
+   
             Messaging.EmailFileAttachment attachment = new Messaging.EmailFileAttachment();
+
+            attachment.setContentType('application/pdf');
             attachment.setFileName(opp.Account.Name + '.pdf');
             attachment.setBody(pdfBlob);
             email.setFileAttachments(new Messaging.EmailFileAttachment[]{ attachment});
