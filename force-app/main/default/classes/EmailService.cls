@@ -6,6 +6,7 @@ public with sharing class EmailService {
 
             //generate pdf blob
             
+            Blob pdfBlob = EncodingUtil.base64Decode(attachment);
             Blob pdfBlob = generatePdfBlob(opp, lineItems);
             //create email
             Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
