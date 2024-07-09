@@ -1,5 +1,40 @@
 public with sharing class EmailService {
-    @AuraEnabled
+    public static void sendInvoices(List<Opportunity> opportunities){
+        for (Opportunity opp : opportunities){
+            List<OpportunityLineItem> lineItems = [SELECT ServiceDate, Name, Quantity, UnitPrice, TotalPrice
+                                                FROM OpportunityLineItem WHERE OpportunityId = :opp.Id];
+
+            //generate pdf blob
+            Blob pdfBlob = generatePdfBlob(opp, lineItems);
+            //create email
+            Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
+            email.setToAddresses(new String[]{ opp.Owner.Email });
+            email.setSubject('subject');
+            email.setPlainTextBody('Your invoice is attached');
+            Messaging.EmailFileAttachment attachment = new Messaging.EmailFileAttachment();
+            attachment.setFileName(opp.Account.Name + '.pdf');
+            attachment.setBody(pdfBlob);
+            email.setFileAttachments(new Messaging.EmailFileAttachment[]{ attachment});
+
+            Messaging.sendEmail(new Messaging.SingleEmailMessage[]{ email });
+            System.debug('Email sent successfully.');
+        }  
+    }
+
+    public static Blob generatePdfBlob(Opportunity opp, List<OpportunityLineItem> lineItems) {
+        //generatepdf logic
+        String pdfContent = 'Invoice for ' + opp.Account.Name;
+        return Blob.valueOf(pdfContent);
+    }
+
+
+
+
+
+
+
+
+    /*@AuraEnabled
     public static void sendInvoiceEmail(String recipientEmail, String subject, String body, String attachment, String fileName) {
         try{
             //Create email
@@ -24,5 +59,5 @@ public with sharing class EmailService {
             System.debug('Error sending email: ' + e.getMessage());
             throw new AuraHandledException('exceptionText'+ e.getMessage());
         }
-    }
+    }*/
 }

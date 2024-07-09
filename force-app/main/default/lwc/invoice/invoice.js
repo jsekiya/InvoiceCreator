@@ -164,7 +164,6 @@ export default class Invoice extends LightningElement {
 
         reader.onloadend = () => {
             const base64data = reader.result.split(',')[1];
-            
             sendInvoiceEmail({
                 recipientEmail: this.opportunityOwnerEmail,
                 subject: 'Your invoice',
@@ -172,14 +171,17 @@ export default class Invoice extends LightningElement {
                 attachment: base64data,
                 fileName: this.accountName + '.pdf'
             })
-            .then(result => {
-                console.log(result);
+            .then(() => {
+                this.dispatchEvent(new CloseActionScreenEvent());
+            })
+            .then(() => {
                 const event = new ShowToastEvent({
-                    title: 'Get Help',
+                    varriant: 'success',
+                    title: '請求書が送信されました。',
                     message:
                         'Salesforce documentation is available in the app. Click ? in the upper-right corner.',
                 });
-                this.dispatchEvent(event);
+                this.dispatchEvent(event); 
             })
             .catch(error => {
                 console.log(error);
