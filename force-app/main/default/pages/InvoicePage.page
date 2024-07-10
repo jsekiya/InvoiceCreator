@@ -1,0 +1,75 @@
+<apex:page renderAs="pdf" controller="InvoiceController">
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <style>
+            
+        </style>
+    </head>
+    <body>
+        <div class="header">Invoice</div>
+
+        <div class="section">
+            <p>Issue Date： {!opportunityCloseDate}</p>
+            <p>Invoice Number: {!opportunityOrderNumber}</p>
+        </div>
+
+        <div class="section">
+            <p class="header">To: {!accountName}</p>
+            <p>{!billingPostalCode}</p>
+            <p>{!billingState}, {!billingCity}, {!billingStreet}</p>
+        </div>
+
+        <div class="section">
+            <p>Please find the details of the invoice below.</p>
+            <p>Total Amount (incl.tax)</p>
+            <p>
+                {!totalAmount}
+            </p>
+        </div>
+
+        <div class="section">
+            <p class="header">Bank Information</p>
+            <p>
+                {!bankName} {!branchName} {!bankAccountNumber}
+                {!bankAccountHolderName}
+            </p>
+        </div>
+        <div class="section">
+            <table class="info-table">
+                <tr>
+                    <th>Date</th>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Total Price</th>
+                </tr>
+                <apex:repeat value="{!opportunityLineItems}" var="item">
+                    <tr>
+                        <td>{!item.ServiceDate}</td>
+                        <td>{!item.Name}</td>
+                        <td>{!item.Quantity}</td>
+                        <td>{!item.UnitPrice}</td>
+                        <td>{!item.TotalPrice}</td>
+                    </tr>
+                </apex:repeat>
+                <tr class="total-row">
+                    <td colspan="4">Subtotal Before Tax: </td>
+                    <td>{!beforeTax}</td>
+                </tr>
+                <tr class="total-row">
+                    <td colspan="4">Tax Amount: </td>
+                    <td>{!tenPercentAmount}</td>
+                </tr>
+                <tr class="total-row">
+                    <td colspan="4">Total Amount: </td>
+                    <td>{!totalAmount}</td>
+                </tr>
+            </table>
+        </div>
+
+
+       
+    </body>
+    </html>
+    
+</apex:page>
