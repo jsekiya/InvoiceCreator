@@ -1,3 +1,4 @@
+//invoice lightning component`s controller
 public with sharing class OpportunityLineItemController {
     @AuraEnabled(cacheable = true)
     public static List<OpportunityLineItem> getOpportunityLineItems(String recordId){

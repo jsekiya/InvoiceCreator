@@ -1,38 +1,36 @@
 <apex:page renderAs="pdf" controller="InvoiceController">
     <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <style>
+        <style type="text/css">
             
         </style>
     </head>
     <body>
-        <div class="header">Invoice</div>
+        <h1 class="header">Invoice</h1>
 
         <div class="section">
-            <p>Issue Date： {!opportunityCloseDate}</p>
-            <p>Invoice Number: {!opportunityOrderNumber}</p>
+            Issue Date:
+            <apex:outputText value="{0,date,yyyy/MM/dd}">
+                <apex:param value="{!opportunity.CloseDate}" /> 
+            </apex:outputText>
+            <p>Invoice Number: {!opportunity.OrderNumber__c}</p>
         </div>
 
         <div class="section">
-            <p class="header">To: {!accountName}</p>
-            <p>{!billingPostalCode}</p>
-            <p>{!billingState}, {!billingCity}, {!billingStreet}</p>
+            <h2 class="header">To: {!opportunity.Account.Name}</h2>
+            <p>Postal Code: {!opportunity.Account.billingPostalCode}</p>
+            <p>Address: {!opportunity.Account.billingState}, {!opportunity.Account.billingCity}, {!opportunity.Account.billingStreet}</p>
         </div>
 
         <div class="section">
-            <p>Please find the details of the invoice below.</p>
-            <p>Total Amount (incl.tax)</p>
-            <p>
-                {!totalAmount}
-            </p>
+            <h4>Please find the details of the invoice below.</h4>
+            <h2>Total Amount (incl.tax): {!totalAmount}</h2>
         </div>
 
         <div class="section">
-            <p class="header">Bank Information</p>
-            <p>
-                {!bankName} {!branchName} {!bankAccountNumber}
-                {!bankAccountHolderName}
-            </p>
+            <h3 class="header">Bank Information</h3>
+            <p>{!opportunity.BankAccount__r.BankName__c} {!opportunity.BankAccount__r.BranchName__c} {!opportunity.BankAccount__r.BankAccountNumber__c}</p>
+            <p>{!opportunity.BankAccount__r.BankAccountHolderName__c}</p>
         </div>
         <div class="section">
             <table class="info-table">
@@ -45,30 +43,42 @@
                 </tr>
                 <apex:repeat value="{!opportunityLineItems}" var="item">
                     <tr>
-                        <td>{!item.ServiceDate}</td>
+                        <td>
+                            <apex:outputText value="{0,date,yyyy/MM/dd}">
+                                <apex:param value="{!item.ServiceDate}" /> 
+                            </apex:outputText>
+                        </td>
                         <td>{!item.Name}</td>
                         <td>{!item.Quantity}</td>
-                        <td>{!item.UnitPrice}</td>
-                        <td>{!item.TotalPrice}</td>
+                        <td>
+                            {!item.UnitPrice}
+                            
+                        </td>
+                        <td>
+                            {!item.TotalPrice}
+                        </td>
                     </tr>
                 </apex:repeat>
                 <tr class="total-row">
                     <td colspan="4">Subtotal Before Tax: </td>
-                    <td>{!beforeTax}</td>
+                    <td>
+                        {!beforeTax}
+                    </td>
                 </tr>
                 <tr class="total-row">
                     <td colspan="4">Tax Amount: </td>
-                    <td>{!tenPercentAmount}</td>
+                    <td>
+                        {!tenPercentAmount}
+                    </td>
                 </tr>
                 <tr class="total-row">
                     <td colspan="4">Total Amount: </td>
-                    <td>{!totalAmount}</td>
+                    <td>
+                        {!totalAmount}
+                    </td>
                 </tr>
             </table>
         </div>
-
-
-       
     </body>
     </html>
     

@@ -9,8 +9,15 @@ public with sharing class EmailService {
             //create email
             Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
             email.setToAddresses(new String[]{ opp.Owner.Email });
-            email.setSubject('subject');
-            email.setPlainTextBody('Your invoice is attached');
+            email.setSubject('Invoice ' + opp.Account.Name);
+            email.setPlainTextBody(
+                'Dear ' + opp.Account.Name + ',\n' +
+                'This invoice is for your reference. You can view the invoice by ' +
+                'clicking the pdf file below.\n\n' +
+                'Best Regards,' + '\n' 
+                /*opp.Owner.Name + '\n' +
+                opp.Owner.CompanyName*/
+            );
 
             Messaging.EmailFileAttachment attachment = new Messaging.EmailFileAttachment();
             attachment.setContentType('application/pdf');
@@ -26,18 +33,7 @@ public with sharing class EmailService {
     public static Blob generatePdfBlob(Opportunity opp, List<OpportunityLineItem> lineItems) {
         //generatepdf logic
         PageReference pdfPage = Page.InvoicePage;
-
-        List<String> lineItemIds = new List<String>();
-        for (OpportunityLineItem lineItem : lineItems){
-            lineItemIds.add(lineItem.Id);
-        }
-
-        String lineItemsIdsString = String.join(lineItemIds, ',');
-        
         pdfPage.getParameters().put('oppId', opp.Id);
-        pdfPage.getParameters().put('lineItemsIds', lineItemsIdsString);
-
-        //generate pdf
         Blob pdfBlob = pdfPage.getContentAsPDF();
         return pdfBlob;
     }
