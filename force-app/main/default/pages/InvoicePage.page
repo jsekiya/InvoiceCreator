@@ -1,45 +1,56 @@
-<apex:page renderAs="pdf" controller="InvoiceController">
-    <html xmlns="http://www.w3.org/1999/xhtml">
+<apex:page controller="InvoiceController" renderAs="pdf" applyhtmltag="false" showheader="false">
+    
     <head>
-        <style type="text/css">
-            
+        <style>
+            body {
+                font-family: 'Arial Unicode MS';
+                font-size: 12pt;
+            }
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
         </style>
     </head>
     <body>
-        <h1 class="header">Invoice</h1>
+        <h1 class="header">請求書</h1>
 
         <div class="section">
-            Issue Date:
+            発行日：
             <apex:outputText value="{0,date,yyyy/MM/dd}">
                 <apex:param value="{!opportunity.CloseDate}" /> 
             </apex:outputText>
-            <p>Invoice Number: {!opportunity.OrderNumber__c}</p>
+            <p>請求番号： {!opportunity.OrderNumber__c}</p>
         </div>
 
         <div class="section">
-            <h2 class="header">To: {!opportunity.Account.Name}</h2>
-            <p>Postal Code: {!opportunity.Account.billingPostalCode}</p>
-            <p>Address: {!opportunity.Account.billingState}, {!opportunity.Account.billingCity}, {!opportunity.Account.billingStreet}</p>
+            <h2 class="header">{!opportunity.Account.Name}御中</h2>
+            <p>〒{!opportunity.Account.billingPostalCode}</p>
+            <p>{!opportunity.Account.billingState}{!opportunity.Account.billingCity}{!opportunity.Account.billingStreet}</p>
         </div>
 
         <div class="section">
-            <h4>Please find the details of the invoice below.</h4>
-            <h2>Total Amount (incl.tax): {!totalAmount}</h2>
+            <h4>下記の通り、ご請求申し上げます。</h4>
+            <h2>ご請求金額（税込）：
+                <apex:outputText value="￥ {0,number,#,###}">
+                    <apex:param value="{!totalAmount}" />
+                </apex:outputText>
+            </h2>
         </div>
 
         <div class="section">
-            <h3 class="header">Bank Information</h3>
+            <h3 class="header">振込先:</h3>
             <p>{!opportunity.BankAccount__r.BankName__c} {!opportunity.BankAccount__r.BranchName__c} {!opportunity.BankAccount__r.BankAccountNumber__c}</p>
             <p>{!opportunity.BankAccount__r.BankAccountHolderName__c}</p>
         </div>
         <div class="section">
             <table class="info-table">
                 <tr>
-                    <th>Date</th>
-                    <th>Product Name</th>
-                    <th>Quantity</th>
-                    <th>Unit Price</th>
-                    <th>Total Price</th>
+                    <th>日付</th>
+                    <th>内容</th>
+                    <th>数量</th>
+                    <th>単価</th>
+                    <th>金額（税込み）</th>
                 </tr>
                 <apex:repeat value="{!opportunityLineItems}" var="item">
                     <tr>
@@ -51,35 +62,42 @@
                         <td>{!item.Name}</td>
                         <td>{!item.Quantity}</td>
                         <td>
-                            {!item.UnitPrice}
-                            
+                            <apex:outputText value="￥{0,number,#,###}">
+                                <apex:param value="{!item.UnitPrice}" />
+                            </apex:outputText>
                         </td>
                         <td>
-                            {!item.TotalPrice}
+                            <apex:outputText value="￥{0,number,#,###}">
+                                <apex:param value="{!item.TotalPrice}" />
+                            </apex:outputText>
                         </td>
                     </tr>
                 </apex:repeat>
                 <tr class="total-row">
-                    <td colspan="4">Subtotal Before Tax: </td>
+                    <td colspan="4">小計</td>
                     <td>
-                        {!beforeTax}
+                        <apex:outputText value="￥{0,number,#,###}">
+                            <apex:param value="{!beforeTax}" />
+                        </apex:outputText>
                     </td>
                 </tr>
                 <tr class="total-row">
-                    <td colspan="4">Tax Amount: </td>
+                    <td colspan="4">消費税</td>
                     <td>
-                        {!tenPercentAmount}
+                        <apex:outputText value="￥{0,number,#,###}">
+                            <apex:param value="{!tenPercentAmount}" />
+                        </apex:outputText>
                     </td>
                 </tr>
                 <tr class="total-row">
-                    <td colspan="4">Total Amount: </td>
+                    <td colspan="4">合計金額</td>
                     <td>
-                        {!totalAmount}
+                        <apex:outputText value="￥{0,number,#,###}">
+                            <apex:param value="{!totalAmount}" />
+                        </apex:outputText>
                     </td>
                 </tr>
             </table>
         </div>
-    </body>
-    </html>
-    
+    </body>   
 </apex:page>

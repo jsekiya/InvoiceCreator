@@ -9,14 +9,14 @@ public with sharing class EmailService {
             //create email
             Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
             email.setToAddresses(new String[]{ opp.Owner.Email });
-            email.setSubject('Invoice ' + opp.Account.Name);
+            email.setSubject('Invoice - ' + opp.Account.Name);
             email.setPlainTextBody(
-                'Dear ' + opp.Account.Name + ',\n' +
+                'Dear ' + opp.Account.Name + ',\n\n' +
                 'This invoice is for your reference. You can view the invoice by ' +
                 'clicking the pdf file below.\n\n' +
-                'Best Regards,' + '\n' 
-                /*opp.Owner.Name + '\n' +
-                opp.Owner.CompanyName*/
+                'Best Regards' + '\n' +
+                opp.Owner.Name + '\n' +
+                opp.Owner.CompanyName
             );
 
             Messaging.EmailFileAttachment attachment = new Messaging.EmailFileAttachment();
