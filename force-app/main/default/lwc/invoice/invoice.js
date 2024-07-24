@@ -27,7 +27,7 @@ import BANK_DEPOSIT_TYPE_FIELD from '@salesforce/schema/Opportunity.BankAccount_
 import BANK_ACCOUNT_HOLDER_FIELD from '@salesforce/schema/Opportunity.BankAccount__r.BankAccountHolderName__c';
 
 import getOpportunityLineItems from '@salesforce/apex/OpportunityLineItemController.getOpportunityLineItems';
-import sendInvoiceEmail from '@salesforce/apex/EmailService.sendInvoiceEmail';
+
 
 const FIELDS = [
     ACCOUNT_NAME_FIELD,
@@ -51,7 +51,7 @@ const FIELDS = [
 ];
 
 export default class Invoice extends LightningElement {
-    opportunityDetails = [];
+    /*opportunityDetails = [];
     @api recordId;
     totalAmount;
     contactName;
@@ -238,7 +238,7 @@ export default class Invoice extends LightningElement {
     }
     calculateTenPercent(amount){
         return amount ? (amount * 0.1) : 0;
-    }
+    }*/
 }
                 
 

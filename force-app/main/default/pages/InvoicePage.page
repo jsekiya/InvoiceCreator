@@ -4,7 +4,7 @@
         <style>
             body {
                 font-family: 'Arial Unicode MS';
-                font-size: 14pt;
+                font-size: 14px;
                 line-height: 1.42857143;
                 color: #333;
                 background-color: white;
@@ -15,40 +15,42 @@
                 size: A4;
                 margin: 10mm;
             }
-            header {
-                font-size: large;
+            .header {
+                font-size: 20px;
                 background-color: #115cff;
                 color: white;
                 padding: 10px;
                 margin-bottom: 10px;
                 text-align: center;
             }
-            section{
-                margin-bottom: 2rem;
+            .section{
+                margin-bottom: 50px;
             }
-            info-table, info-table th, info-table td {
+            .info-table{
+                width: 100%;
+            }
+            .info-table, .info-table th, .info-table td {
                 border: 1px solid black;
                 border-collapse: collapse;
                 padding: 5px;
                 text-align: right;
             }
-            info-table th {
+            .info-table th {
                 background-color: #115cff;
                 color: white;
             }
-            total-row {
+            .total-row {
                 font-weight: bold;
             }
-            right-aligned {
+            .right-aligned {
                 text-align: right;
             }
-            flex-container {
-                display: flex;
-                justify-content: space-between;
+            .flex-container {
+                overflow: hidden;
             }
-            flex-item {
-                flex:1;
-                padding: 0 10px;
+            .flex-item {
+                float:left;
+                padding: 0 20px;
             }
         </style>
     </head>
@@ -65,21 +67,17 @@
 
         <div class="flex-container">
             <div class="flex-item">
-                <div class="section">
-                    <h2 class="header">{!opportunity.Account.Name}御中</h2>
-                    <p>〒{!opportunity.Account.billingPostalCode}</p>
-                    <p>{!opportunity.Account.billingState}{!opportunity.Account.billingCity}{!opportunity.Account.billingStreet}</p>
-                </div>
+                <h2>{!opportunity.Account.Name}御中</h2>
+                <p>〒{!opportunity.Account.billingPostalCode}</p>
+                <p>{!opportunity.Account.billingState}{!opportunity.Account.billingCity}{!opportunity.Account.billingStreet}</p>
             </div>
 
             <div class="flex-item">
-                <div class="section">
-                    <h2 class="header">{!opportunity.Owner.CompanyName}</h2>
-                    <p>〒{!opportunity.Owner.PostalCode}</p>
-                    <p>住所：{!opportunity.Owner.Street}</p>
-                    <p>電話：{!opportunity.Owner.Phone}</p>
-                    <p>メール：{!opportunity.Owner.Email}</p>
-                </div>
+                <h2>{!opportunity.Owner.CompanyName}</h2>
+                <p>〒{!opportunity.Owner.PostalCode}</p>
+                <p>住所：{!opportunity.Owner.Street}</p>
+                <p>電話：{!opportunity.Owner.Phone}</p>
+                <p>メール：{!opportunity.Owner.Email}</p>
             </div>
         </div>
 
@@ -93,7 +91,7 @@
         </div>
 
         <div class="section">
-            <h3 class="header">振込先:</h3>
+            <h3>振込先:</h3>
             <p>{!opportunity.BankAccount__r.BankName__c} {!opportunity.BankAccount__r.BranchName__c} {!opportunity.BankAccount__r.BankAccountNumber__c}</p>
             <p>{!opportunity.BankAccount__r.BankAccountHolderName__c}</p>
         </div>
