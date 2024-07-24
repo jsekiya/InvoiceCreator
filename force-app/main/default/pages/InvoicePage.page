@@ -4,18 +4,58 @@
         <style>
             body {
                 font-family: 'Arial Unicode MS';
-                font-size: 12pt;
+                font-size: 14pt;
+                line-height: 1.42857143;
+                color: #333;
+                background-color: white;
+                margin: 0;
+                padding: 2rem;
             }
             @page {
                 size: A4;
                 margin: 10mm;
+            }
+            header {
+                font-size: large;
+                background-color: #115cff;
+                color: white;
+                padding: 10px;
+                margin-bottom: 10px;
+                text-align: center;
+            }
+            section{
+                margin-bottom: 2rem;
+            }
+            info-table, info-table th, info-table td {
+                border: 1px solid black;
+                border-collapse: collapse;
+                padding: 5px;
+                text-align: right;
+            }
+            info-table th {
+                background-color: #115cff;
+                color: white;
+            }
+            total-row {
+                font-weight: bold;
+            }
+            right-aligned {
+                text-align: right;
+            }
+            flex-container {
+                display: flex;
+                justify-content: space-between;
+            }
+            flex-item {
+                flex:1;
+                padding: 0 10px;
             }
         </style>
     </head>
     <body>
         <h1 class="header">請求書</h1>
 
-        <div class="section">
+        <div class="section right-aligned">
             発行日：
             <apex:outputText value="{0,date,yyyy/MM/dd}">
                 <apex:param value="{!opportunity.CloseDate}" /> 
@@ -23,10 +63,24 @@
             <p>請求番号： {!opportunity.OrderNumber__c}</p>
         </div>
 
-        <div class="section">
-            <h2 class="header">{!opportunity.Account.Name}御中</h2>
-            <p>〒{!opportunity.Account.billingPostalCode}</p>
-            <p>{!opportunity.Account.billingState}{!opportunity.Account.billingCity}{!opportunity.Account.billingStreet}</p>
+        <div class="flex-container">
+            <div class="flex-item">
+                <div class="section">
+                    <h2 class="header">{!opportunity.Account.Name}御中</h2>
+                    <p>〒{!opportunity.Account.billingPostalCode}</p>
+                    <p>{!opportunity.Account.billingState}{!opportunity.Account.billingCity}{!opportunity.Account.billingStreet}</p>
+                </div>
+            </div>
+
+            <div class="flex-item">
+                <div class="section">
+                    <h2 class="header">{!opportunity.Owner.CompanyName}</h2>
+                    <p>〒{!opportunity.Owner.PostalCode}</p>
+                    <p>住所：{!opportunity.Owner.Street}</p>
+                    <p>電話：{!opportunity.Owner.Phone}</p>
+                    <p>メール：{!opportunity.Owner.Email}</p>
+                </div>
+            </div>
         </div>
 
         <div class="section">
